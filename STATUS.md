@@ -8,6 +8,7 @@ Pubblicata con GitHub Pages dal repository `timbros`, installata da Safari con "
 - PWA invece di app nativa: requisito gratis + duratura + sviluppabile da Windows.
 - Nessun server: dati solo sul telefono (localStorage, chiave `timbrature.v1`). Backup con Esporta/Importa (JSON).
 - Più turni al giorno (tipico 8–12 e 17–20), sommati. Correzione/aggiunta/eliminazione manuale dei turni.
+- Modifiche e turni aggiunti a mano si salvano solo con OK (Annulla per scartare), non mentre si gira la rotella.
 - Le ore contano nel giorno di entrata; nessuna gestione speciale della mezzanotte.
 - Settimana da lunedì. Niente straordinari. Grafica semplice, conta la comodità.
 - Nessuna dipendenza esterna: un solo `index.html` + `sw.js` (offline) + manifest + icone.
