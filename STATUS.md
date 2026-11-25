@@ -14,11 +14,13 @@ Pubblicata con GitHub Pages dal repository `timbros`, installata da Safari con "
 
 ## Stato
 - App completa e provata nel browser (Chromium, 375×812): timbrature, totali, calendario, modifica, validazione, eliminazione, importazione, funzionamento offline.
-- Non provato: esportazione (download/condivisione) e comportamento reale su iPhone/Safari.
+- Online su https://gioelesoggiu.github.io/timbros/ (GitHub Pages, branch main, root).
+- Installata su iPhone dalla schermata Home: funziona (confermato dall'utente il 2026-11-25).
+- Da confermare: esportazione del backup su iPhone.
 
 ## Note tecniche
 - `sw.js`: pagina network-first (aggiornamenti immediati se online), resto cache-first. Alzare `VERSION` se cambiano icone o manifest.
 - Server locale di prova: `.claude/launch.json` (python http.server, porta 8765).
 
 ## Prossimo passo
-Attivare GitHub Pages, installare sull'iPhone e verificare su Safari.
+Nessuno in corso. Eventuali modifiche: commit, push su `main`, l'app si aggiorna alla prossima apertura con rete.
