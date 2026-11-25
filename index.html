@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timbrature</title>
+<meta name="theme-color" content="#1f6feb">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Timbrature">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{
+  --bg:#f4f5f7; --card:#fff; --text:#1b1f24; --muted:#6b7280; --line:#e3e5e8;
+  --in:#1a7f37; --out:#cf222e; --accent:#1f6feb; --today:#ddeaff; --sel:#1f6feb;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0d1117; --card:#161b22; --text:#e6edf3; --muted:#8b949e; --line:#30363d;
+    --in:#2ea043; --out:#da3633; --accent:#4493f8; --today:#1c2d48; --sel:#4493f8;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding:calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 16px)
+          calc(env(safe-area-inset-bottom) + 24px) calc(env(safe-area-inset-left) + 16px);
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+}
+main{max-width:480px; margin:0 auto; display:flex; flex-direction:column; gap:12px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px}
+#status{font-size:17px; text-align:center; font-weight:600}
+#status small{display:block; color:var(--muted); font-weight:400; font-size:14px; margin-top:2px}
+.btns{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.big{
+  height:96px; border:0; border-radius:16px; color:#fff; font-size:22px; font-weight:700;
+  letter-spacing:.5px; cursor:pointer;
+}
+.big:active{transform:scale(.98)}
+.big:disabled{opacity:.3}
+#btnIn{background:var(--in)} #btnOut{background:var(--out)}
+.totals{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center}
+.totals div{display:flex; flex-direction:column}
+.totals span{font-size:13px; color:var(--muted)}
+.totals b{font-size:18px; font-variant-numeric:tabular-nums}
+.calhead{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px}
+.calhead h2{margin:0; font-size:17px; text-transform:capitalize; text-align:center}
+.calhead h2 small{display:block; font-size:13px; color:var(--muted); font-weight:400; text-transform:none}
+.nav{background:none; border:0; color:var(--accent); font-size:28px; width:44px; height:44px; cursor:pointer}
+.grid{display:grid; grid-template-columns:repeat(7,1fr); gap:4px}
+.wd{text-align:center; font-size:12px; color:var(--muted); padding-bottom:2px}
+.day{
+  min-height:50px; border-radius:8px; border:1px solid var(--line); background:none; color:var(--text);
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start; padding:4px 0;
+  font:inherit; font-size:14px; cursor:pointer;
+}
+.day .h{font-size:11px; color:var(--accent); font-weight:600; margin-top:3px; font-variant-numeric:tabular-nums}
+.day.today{background:var(--today)}
+.day.sel{border:2px solid var(--sel)}
+.day.empty{border:0; cursor:default}
+#dayTitle{margin:0 0 10px; font-size:17px}
+#dayTitle::first-letter{text-transform:uppercase}
+.row{display:flex; align-items:center; gap:8px; padding:8px 0; border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row label{display:flex; flex-direction:column; font-size:12px; color:var(--muted); flex:1}
+.row input{
+  font:inherit; font-size:17px; padding:6px; border:1px solid var(--line); border-radius:8px;
+  background:var(--bg); color:var(--text); width:100%; min-height:40px;
+}
+.row .d{width:58px; text-align:right; font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; font-size:15px}
+.del{background:none; border:0; color:var(--out); font-size:22px; width:40px; height:40px; cursor:pointer}
+.none{color:var(--muted); margin:0 0 8px}
+.small{
+  font:inherit; font-size:16px; padding:10px 14px; border-radius:10px; border:1px solid var(--line);
+  background:var(--bg); color:var(--accent); cursor:pointer;
+}
+.tools{display:flex; gap:8px; justify-content:center; flex-wrap:wrap}
+#dayTotal{color:var(--muted); font-size:14px; margin-top:8px}
+</style>
+</head>
+<body>
+<main>
+  <div class="card" id="status">Fuori servizio</div>
+
+  <div class="btns">
+    <button class="big" id="btnIn">ENTRATA</button>
+    <button class="big" id="btnOut">USCITA</button>
+  </div>
+
+  <div class="card totals">
+    <div><span>Oggi</span><b id="tDay">0:00</b></div>
+    <div><span>Settimana</span><b id="tWeek">0:00</b></div>
+    <div><span>Mese</span><b id="tMonth">0:00</b></div>
+    <div><span>Anno</span><b id="tYear">0:00</b></div>
+  </div>
+
+  <div class="card">
+    <div class="calhead">
+      <button class="nav" id="prev" aria-label="Mese precedente">‹</button>
+      <h2 id="monthTitle"></h2>
+      <button class="nav" id="next" aria-label="Mese successivo">›</button>
+    </div>
+    <div class="grid" id="cal"></div>
+  </div>
+
+  <div class="card">
+    <h3 id="dayTitle"></h3>
+    <div id="dayList"></div>
+    <div id="dayTotal"></div>
+    <div style="margin-top:10px"><button class="small" id="addBtn">+ Aggiungi turno</button></div>
+  </div>
+
+  <div class="tools">
+    <button class="small" id="expBtn">Esporta backup</button>
+    <button class="small" id="impBtn">Importa backup</button>
+    <input type="file" id="impFile" accept=".json,application/json" hidden>
+  </div>
+</main>
+
+<script>
+const KEY = 'timbrature.v1';
+const MIN = 60000;
+const MONTHS = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+function dayKey(t){ const d = new Date(t); return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+function keyToDate(k){ const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d); }
+const fmt = ms => { const m = Math.floor(ms / MIN); return Math.floor(m/60) + ':' + pad(m % 60); };
+const hhmm = t => { const d = new Date(t); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const nowMin = () => Math.floor(Date.now() / MIN) * MIN;
+const dur = s => Math.max(0, (s.end == null ? Date.now() : s.end) - s.start);
+const openSession = () => sessions.find(s => s.end == null);
+const newId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+
+let sessions = load();
+const now0 = new Date();
+let view = new Date(now0.getFullYear(), now0.getMonth(), 1);
+let selected = dayKey(Date.now());
+
+function load(){
+  try { const s = JSON.parse(localStorage.getItem(KEY)); return Array.isArray(s) ? s : []; }
+  catch { return []; }
+}
+function save(){
+  try { localStorage.setItem(KEY, JSON.stringify(sessions)); }
+  catch { alert('Errore nel salvataggio dei dati.'); }
+}
+function sumRange(a, b){
+  a = +a; b = +b;
+  return sessions.filter(s => s.start >= a && s.start < b).reduce((t, s) => t + dur(s), 0);
+}
+function addDays(d, n){ const x = new Date(d); x.setDate(x.getDate() + n); return x; }
+function startOfWeek(d){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); return addDays(x, -((x.getDay() + 6) % 7)); }
+
+// ---- parte alta: stato, pulsanti, totali, calendario ----
+function renderTop(){
+  const n = new Date();
+  const open = openSession();
+  if (open){
+    const sameDay = dayKey(open.start) === dayKey(n);
+    const when = sameDay ? '' : ' del ' + new Date(open.start).toLocaleDateString('it-IT');
+    $('status').innerHTML = 'In servizio dalle ' + hhmm(open.start) + when + '<small>da ' + fmt(dur(open)) + ' ore</small>';
+  } else {
+    $('status').textContent = 'Fuori servizio';
+  }
+  $('btnIn').disabled = !!open;
+  $('btnOut').disabled = !open;
+
+  const d0 = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  const w0 = startOfWeek(n);
+  $('tDay').textContent = fmt(sumRange(d0, addDays(d0, 1)));
+  $('tWeek').textContent = fmt(sumRange(w0, addDays(w0, 7)));
+  $('tMonth').textContent = fmt(sumRange(new Date(n.getFullYear(), n.getMonth(), 1), new Date(n.getFullYear(), n.getMonth()+1, 1)));
+  $('tYear').textContent = fmt(sumRange(new Date(n.getFullYear(), 0, 1), new Date(n.getFullYear()+1, 0, 1)));
+
+  renderCal();
+}
+
+function renderCal(){
+  const y = view.getFullYear(), m = view.getMonth();
+  const first = new Date(y, m, 1), last = new Date(y, m+1, 1);
+  const perDay = {};
+  for (const s of sessions){
+    if (s.start >= +first && s.start < +last){ const k = dayKey(s.start); perDay[k] = (perDay[k] || 0) + dur(s); }
+  }
+  $('monthTitle').innerHTML = MONTHS[m] + ' ' + y + '<small>totale ' + fmt(sumRange(first, last)) + ' ore</small>';
+
+  const today = dayKey(Date.now());
+  let html = ['L','M','M','G','V','S','D'].map(w => '<div class="wd">' + w + '</div>').join('');
+  const lead = (first.getDay() + 6) % 7;
+  for (let i = 0; i < lead; i++) html += '<div class="day empty"></div>';
+  const days = new Date(y, m+1, 0).getDate();
+  for (let d = 1; d <= days; d++){
+    const k = y + '-' + pad(m+1) + '-' + pad(d);
+    const cls = 'day' + (k === today ? ' today' : '') + (k === selected ? ' sel' : '');
+    const h = perDay[k] ? '<span class="h">' + fmt(perDay[k]) + '</span>' : '';
+    html += '<button class="' + cls + '" data-k="' + k + '">' + d + h + '</button>';
+  }
+  $('cal').innerHTML = html;
+}
+
+// ---- dettaglio del giorno selezionato ----
+function daySessions(){ return sessions.filter(s => dayKey(s.start) === selected).sort((a, b) => a.start - b.start); }
+
+function renderDay(){
+  $('dayTitle').textContent = keyToDate(selected).toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const list = daySessions();
+  if (!list.length){
+    $('dayList').innerHTML = '<p class="none">Nessun turno.</p>';
+    $('dayTotal').textContent = '';
+    return;
+  }
+  $('dayList').innerHTML = list.map(s =>
+    '<div class="row" data-id="' + s.id + '">' +
+      '<label>Entrata<input type="time" data-f="start" value="' + hhmm(s.start) + '"></label>' +
+      '<label>Uscita<input type="time" data-f="end" value="' + (s.end == null ? '' : hhmm(s.end)) + '"></label>' +
+      '<span class="d">' + (s.end == null ? 'in corso' : fmt(dur(s))) + '</span>' +
+      '<button class="del" aria-label="Elimina turno">✕</button>' +
+    '</div>').join('');
+  $('dayTotal').textContent = 'Totale giorno: ' + fmt(list.reduce((t, s) => t + dur(s), 0)) + ' ore';
+}
+
+function renderAll(){ renderTop(); renderDay(); }
+
+// ---- azioni ----
+$('btnIn').onclick = () => {
+  if (openSession()) return;
+  sessions.push({ id: newId(), start: nowMin(), end: null });
+  save(); selected = dayKey(Date.now()); view = new Date(new Date().getFullYear(), new Date().getMonth(), 1); renderAll();
+};
+$('btnOut').onclick = () => {
+  const s = openSession(); if (!s) return;
+  s.end = Math.max(nowMin(), s.start + MIN);
+  save(); renderAll();
+};
+$('prev').onclick = () => { view = new Date(view.getFullYear(), view.getMonth()-1, 1); renderCal(); };
+$('next').onclick = () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); renderCal(); };
+$('cal').onclick = e => {
+  const b = e.target.closest('button[data-k]'); if (!b) return;
+  selected = b.dataset.k; renderCal(); renderDay();
+};
+
+$('dayList').addEventListener('change', e => {
+  const inp = e.target.closest('input[data-f]'); if (!inp) return;
+  const s = sessions.find(x => x.id === inp.closest('.row').dataset.id); if (!s) return;
+  const f = inp.dataset.f, v = inp.value;
+  if (!v){
+    if (f === 'end' && !sessions.some(x => x !== s && x.end == null)){ s.end = null; save(); }
+    else if (f === 'end') alert('C\'è già un altro turno in corso.');
+    renderAll(); return;
+  }
+  const [h, mi] = v.split(':').map(Number);
+  const base = keyToDate(dayKey(s.start));
+  const ts = new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, mi).getTime();
+  if (f === 'start'){
+    if (s.end != null && ts >= s.end){ alert('L\'entrata deve essere prima dell\'uscita.'); renderAll(); return; }
+    s.start = ts;
+  } else {
+    if (ts <= s.start){ alert('L\'uscita deve essere dopo l\'entrata.'); renderAll(); return; }
+    s.end = ts;
+  }
+  save(); renderAll();
+});
+$('dayList').addEventListener('click', e => {
+  if (!e.target.closest('.del')) return;
+  const id = e.target.closest('.row').dataset.id;
+  if (!confirm('Eliminare questo turno?')) return;
+  sessions = sessions.filter(s => s.id !== id);
+  save(); renderAll();
+});
+$('addBtn').onclick = () => {
+  const n = daySessions().length;
+  const [h1, h2] = n === 0 ? [8, 12] : [17, 20];
+  const d = keyToDate(selected);
+  sessions.push({ id: newId(), start: new Date(d.getFullYear(), d.getMonth(), d.getDate(), h1).getTime(),
+                  end: new Date(d.getFullYear(), d.getMonth(), d.getDate(), h2).getTime() });
+  save(); renderAll();
+};
+
+// ---- backup ----
+$('expBtn').onclick = async () => {
+  const json = JSON.stringify({ app: 'timbrature', version: 1, sessions }, null, 1);
+  const name = 'timbrature-' + dayKey(Date.now()) + '.json';
+  const file = new File([json], name, { type: 'application/json' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })){ await navigator.share({ files: [file], title: name }); return; }
+  } catch (err) { if (err && err.name === 'AbortError') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+};
+$('impBtn').onclick = () => $('impFile').click();
+$('impFile').onchange = async e => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text());
+    const list = Array.isArray(data) ? data : data.sessions;
+    const ok = Array.isArray(list) && list.every(s => s && typeof s.start === 'number' && (s.end == null || (typeof s.end === 'number' && s.end > s.start)));
+    if (!ok) throw 0;
+    if (!confirm('Sostituire i ' + sessions.length + ' turni attuali con i ' + list.length + ' del file?')) return;
+    sessions = list.map(s => ({ id: s.id || newId(), start: s.start, end: s.end == null ? null : s.end }));
+    save(); renderAll();
+  } catch { alert('File non valido.'); }
+};
+
+// ---- avvio ----
+renderAll();
+setInterval(renderTop, 20000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderTop(); });
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
