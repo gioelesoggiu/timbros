@@ -10,6 +10,8 @@ Pubblicata con GitHub Pages dal repository `timbros`, installata da Safari con "
 - Più turni al giorno (tipico 8–12 e 17–20), sommati. Correzione/aggiunta/eliminazione manuale dei turni.
 - Modifiche e turni aggiunti a mano si salvano solo con OK (Annulla per scartare), non mentre si gira la rotella.
 - Le ore contano nel giorno di entrata; nessuna gestione speciale della mezzanotte.
+- Pulsanti ENTRATA/USCITA: orario arrotondato ai 10 minuti più vicini (8:34→8:30, 8:35→8:40). Orari inseriti a mano: liberi.
+- Paga oraria (chiave `timbrature.paga`) con scelta Giorno/Settimana/Mese/Anno in corso: mostra ore × paga. Non inclusa nel backup.
 - Settimana da lunedì. Niente straordinari. Grafica semplice, conta la comodità.
 - Nessuna dipendenza esterna: un solo `index.html` + `sw.js` (offline) + manifest + icone.
 
