@@ -12,6 +12,7 @@ Pubblicata con GitHub Pages dal repository `timbros`, installata da Safari con "
 - Le ore contano nel giorno di entrata; nessuna gestione speciale della mezzanotte.
 - Pulsanti ENTRATA/USCITA: orario arrotondato ai 10 minuti più vicini (8:34→8:30, 8:35→8:40). Orari inseriti a mano: liberi.
 - Paga oraria (chiave `timbrature.paga`) con scelta Giorno/Settimana/Mese/Anno in corso: mostra ore × paga. Non inclusa nel backup.
+- Totali in alto e riquadro paga si riferiscono al giorno selezionato nel calendario (giorno/settimana/mese/anno di quella data); all'apertura è selezionato oggi. Le etichette restano invariate ("Oggi", "Totale oggi", ecc.).
 - Settimana da lunedì. Niente straordinari. Grafica semplice, conta la comodità.
 - Nessuna dipendenza esterna: un solo `index.html` + `sw.js` (offline) + manifest + icone.
 
@@ -25,6 +26,9 @@ Pubblicata con GitHub Pages dal repository `timbros`, installata da Safari con "
 ## Note tecniche
 - `sw.js`: pagina network-first (aggiornamenti immediati se online), resto cache-first. Alzare `VERSION` se cambiano icone o manifest.
 - Server locale di prova: `.claude/launch.json` (python http.server, porta 8765).
+
+## Idee future (non approvate come lavoro)
+- App separata per spese quotidiane veloci (categoria + importo, totali per periodo): l'utente la trova interessante.
 
 ## Prossimo passo
 Nessuno in corso. Eventuali modifiche: commit, push su `main`, l'app si aggiorna alla prossima apertura con rete.

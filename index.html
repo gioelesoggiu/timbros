@@ -208,9 +208,9 @@ function renderTop(){
   renderPay();
 }
 
-// Inizio e fine (esclusa) del giorno / settimana / mese / anno in corso
+// Inizio e fine (esclusa) del giorno / settimana / mese / anno del giorno selezionato nel calendario
 function periodRange(p){
-  const n = new Date(), y = n.getFullYear(), m = n.getMonth();
+  const n = keyToDate(selected), y = n.getFullYear(), m = n.getMonth();
   if (p === 'day'){ const d0 = new Date(y, m, n.getDate()); return [d0, addDays(d0, 1)]; }
   if (p === 'week'){ const w0 = startOfWeek(n); return [w0, addDays(w0, 7)]; }
   if (p === 'month') return [new Date(y, m, 1), new Date(y, m+1, 1)];
@@ -309,7 +309,7 @@ $('prev').onclick = () => { view = new Date(view.getFullYear(), view.getMonth()-
 $('next').onclick = () => { view = new Date(view.getFullYear(), view.getMonth()+1, 1); renderCal(); };
 $('cal').onclick = e => {
   const b = e.target.closest('button[data-k]'); if (!b) return;
-  selected = b.dataset.k; draft = null; renderCal(); renderDay();
+  selected = b.dataset.k; draft = null; renderAll();
 };
 
 // Modificare un orario non salva nulla: compaiono OK / Annulla.
