@@ -1,10 +1,13 @@
 // Cache per uso offline. Cambia VERSION a ogni aggiornamento dei file.
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'timbrature-' + VERSION;
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'];
+const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon2-180.png', './icon2-192.png', './icon2-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache:'reload' = scarica dal server, non dalla cache HTTP del browser (evita file vecchi)
+  e.waitUntil(caches.open(CACHE)
+    .then(c => c.addAll(ASSETS.map(u => new Request(u, { cache: 'reload' }))))
+    .then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
