@@ -19,7 +19,8 @@ Pubblicata con GitHub Pages dal repository `timbros`, installata da Safari con "
 - App completa e provata nel browser (Chromium, 375×812): timbrature, totali, calendario, modifica, validazione, eliminazione, importazione, funzionamento offline.
 - Online su https://gioelesoggiu.github.io/timbros/ (GitHub Pages, branch main, root).
 - Installata su iPhone dalla schermata Home: funziona (confermato dall'utente il 2026-11-25).
-- Da confermare: esportazione del backup su iPhone.
+- Esporta/Importa backup verificati su iPhone (2026-11-26, durante il cambio icona).
+- Icona: immagine fornita dall'utente, file `icon2-*.png`. Cambiare icona richiede di togliere e riaggiungere l'app dalla Home (backup prima: i dati si cancellano).
 
 ## Note tecniche
 - `sw.js`: pagina network-first (aggiornamenti immediati se online), resto cache-first. Alzare `VERSION` se cambiano icone o manifest.
